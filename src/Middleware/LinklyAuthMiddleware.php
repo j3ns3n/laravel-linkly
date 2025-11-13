@@ -82,7 +82,10 @@ class LinklyAuthMiddleware
         parse_str($uri->getQuery(), $queryParams);
 
         $queryParams['api_key'] = $this->defaultValues['api_key'] ?? '';
-        $queryParams['workspace_id'] = $this->defaultValues['workspace_id'] ?? '';
+        // Only add workspace_id if the id is not already in the URL path
+        if (!str_contains($uri->getPath(), 'workspace/')) {
+            $queryParams['workspace_id'] = $this->defaultValues['workspace_id'] ?? '';
+        }
 
         $newUri = $uri->withQuery(http_build_query($queryParams));
 
