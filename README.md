@@ -20,9 +20,10 @@ Add your Linkly API key to your `.env` file:
 
 ```env
 LINKLY_API_KEY=your-api-key-here
-LINKLY_API_URL=https://api.linkly.com/v1
+LINKLY_API_URL=https://app.linklyhq.com/api/v1/
 LINKLY_WORKSPACE_ID=your-workspace-id
 LINKLY_TIMEOUT=30
+LINKLY_WORKSPACE_ID=your-workspace-id
 ```
 
 ## Usage

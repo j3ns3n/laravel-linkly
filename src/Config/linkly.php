@@ -19,7 +19,7 @@ return [
     | Base URL for the Linkly API
     |
     */
-    'api_url' => env('LINKLY_API_URL', 'https://app.linklyhq.com/api/v1'),
+    'api_url' => env('LINKLY_API_URL', 'https://app.linklyhq.com/api/v1/'),
 
     /*
     |--------------------------------------------------------------------------
