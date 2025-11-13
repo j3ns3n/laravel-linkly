@@ -2,10 +2,10 @@
 
 A Laravel package for interacting with the Linkly API.
 
-## [TODO] Installation
+## Installation
 
 ```bash
-composer require j3ns3n/linkly-laravel
+composer require j3ns3n/laravel-linkly
 ```
 
 ## Configuration
