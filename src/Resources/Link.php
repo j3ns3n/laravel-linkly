@@ -66,11 +66,11 @@ class Link implements ArrayAccess, JsonSerializable
 
     public function getShortUrl(): ?string
     {
-        return $this->attributes['url'] ?? null;
+        return $this->attributes['full_url'] ?? null;
     }
 
     public function getOriginalUrl(): ?string
     {
-        return $this->attributes['full_url'] ?? null;
+        return $this->attributes['url'] ?? null;
     }
 }

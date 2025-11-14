@@ -33,8 +33,8 @@ class LinklyClientTest extends TestCase
     {
         $mockResponse = new Response(200, [], json_encode([
             'id' => 'abc123',
-            'url' => 'https://lnk.ly/abc123',
-            'full_url' => 'https://example.com',
+            'full_url' => 'https://lnk.ly/abc123',
+            'url' => 'https://example.com',
         ]));
 
         $client = $this->createMockClient([$mockResponse]);
@@ -52,8 +52,8 @@ class LinklyClientTest extends TestCase
     {
         $mockResponse = new Response(200, [], json_encode([
             'id' => 'abc123',
-            'url' => 'https://lnk.ly/abc123',
-            'full_url' => 'https://example.com',
+            'full_url' => 'https://lnk.ly/abc123',
+            'url' => 'https://example.com',
         ]));
 
         $client = $this->createMockClient([$mockResponse]);
@@ -74,7 +74,7 @@ class LinklyClientTest extends TestCase
         $client = $this->createMockClient([$mockResponse]);
 
         $client->createLink([
-            'full_url' => 'invalid-url',
+            'url' => 'invalid-url',
         ]);
     }
 
@@ -84,13 +84,13 @@ class LinklyClientTest extends TestCase
             'links' => [
                 [
                     'id' => 'link1',
-                    'url' => 'https://lnk.ly/link1',
-                    'full_url' => 'https://example.com/1',
+                    'full_url' => 'https://lnk.ly/link1',
+                    'url' => 'https://example.com/1',
                 ],
                 [
                     'id' => 'link2',
-                    'url' => 'https://lnk.ly/link2',
-                    'full_url' => 'https://example.com/2',
+                    'full_url' => 'https://lnk.ly/link2',
+                    'url' => 'https://example.com/2',
                 ],
             ],
         ]));
