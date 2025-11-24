@@ -13,7 +13,7 @@ class LinklyServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(
-            __DIR__.'/config/linkly.php', 'linkly'
+            __DIR__.'/Config/linkly.php', 'linkly'
         );
 
         $this->app->singleton('linkly', function ($app) {
