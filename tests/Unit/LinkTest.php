@@ -17,7 +17,7 @@ class LinkTest extends TestCase
         parent::tearDown();
     }
 
-    public function testUpdateReturnsUpdatedLink()
+    public function test_update_returns_updated_link()
     {
         $mockClient = Mockery::mock();
         $updatedLink = new Link(
@@ -44,7 +44,7 @@ class LinkTest extends TestCase
         $this->assertEquals('https://original.com', $result->url);
     }
 
-    public function testUpdateThrowsException()
+    public function test_update_throws_exception()
     {
         $mockClient = Mockery::mock();
         $mockClient->shouldReceive('updateLink')
@@ -62,7 +62,7 @@ class LinkTest extends TestCase
         $link->update(['url' => 'https://fail.com']);
     }
 
-    public function testDeleteReturnsTrue()
+    public function test_delete_returns_true()
     {
         $mockClient = Mockery::mock();
         $mockClient->shouldReceive('deleteLink')
@@ -80,7 +80,7 @@ class LinkTest extends TestCase
         $this->assertTrue($link->delete());
     }
 
-    public function testDeleteReturnsFalse()
+    public function test_delete_returns_false()
     {
         $mockClient = Mockery::mock();
         $mockClient->shouldReceive('deleteLink')
@@ -98,7 +98,7 @@ class LinkTest extends TestCase
         $this->assertFalse($link->delete());
     }
 
-    public function testDeleteThrowsException()
+    public function test_delete_throws_exception()
     {
         $mockClient = Mockery::mock();
         $mockClient->shouldReceive('deleteLink')
