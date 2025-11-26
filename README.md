@@ -103,6 +103,15 @@ echo $link->getId();
 echo $link->getShortUrl();
 echo $link->getOriginalUrl();
 
+// Update the link
+$link = $link->update([
+    'name' => 'Updated Name',
+    // ...other fields...
+]);
+
+// Delete the link
+$deleted = $link->delete();
+
 // Convert to array
 $array = $link->toArray();
 

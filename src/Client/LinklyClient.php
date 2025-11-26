@@ -135,7 +135,42 @@ class LinklyClient
     /**
      * Update a link
      *
-     * @param  string[]  $data
+     * @param array{
+     *     url?: string,
+     *     fb_pixel_id?: string,
+     *     hide_referrer?: bool,
+     *     expiry_datetime?: string,
+     *     expiry_destination?: string,
+     *     rules?: array{
+     *      matches: ?string,
+     *      percentage: ?int,
+     *      url: ?string,
+     *      what: ?string,
+     *     },
+     *     cloaking?: bool,
+     *     linkify_words?: string,
+     *     og_description?: string,
+     *     body_tags?: string,
+     *     og_title?: string,
+     *     note?: string,
+     *     name?: string,
+     *     gtm_id?: string,
+     *     og_image?: string,
+     *     block_bots?: bool,
+     *     utm_content?: string,
+     *     enabled?: bool,
+     *     replacements?: string,
+     *     public_analytics?: bool,
+     *     utm_source?: string,
+     *     slug?: string,
+     *     domain?: string,
+     *     forward_params?: bool,
+     *     utm_medium?: string,
+     *     head_tags?: string,
+     *     ga4_tag_id?: string,
+     *     utm_term?: string,
+     *     utm_campaign?: string
+     * } $data
      *
      * @throws LinklyException
      */

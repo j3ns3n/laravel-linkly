@@ -2,6 +2,7 @@
 
 namespace J3ns3n\LaravelLinkly\Resources;
 
+use J3ns3n\LaravelLinkly\Exceptions\LinklyException;
 use JsonSerializable;
 
 class Link implements JsonSerializable
@@ -13,36 +14,36 @@ class Link implements JsonSerializable
         public int $id,
         public string $url,
         public string $full_url,
-        public ?string $fb_pixel_id,
-        public ?bool $hide_referrer,
-        public ?string $expiry_datetime,
-        public ?string $expiry_destination,
-        public ?array $rules,
-        public ?bool $cloaking,
-        public ?string $linkify_words,
-        public ?string $og_description,
-        public ?string $body_tags,
-        public ?string $og_title,
-        public ?string $note,
-        public ?string $name,
-        public ?string $gtm_id,
-        public ?string $og_image,
-        public ?bool $block_bots,
-        public ?string $utm_content,
-        public ?bool $enabled,
-        public ?string $replacements,
-        public ?bool $deleted,
-        public ?int $workspace_id,
-        public ?bool $public_analytics,
-        public ?string $utm_source,
-        public ?string $slug,
-        public ?string $domain,
-        public ?bool $forward_params,
-        public ?string $utm_medium,
-        public ?string $head_tags,
-        public ?string $ga4_tag_id,
-        public ?string $utm_term,
-        public ?string $utm_campaign,
+        public ?string $fb_pixel_id = null,
+        public ?bool $hide_referrer = null,
+        public ?string $expiry_datetime = null,
+        public ?string $expiry_destination = null,
+        public ?array $rules = ['matches' => null, 'percentage' => null, 'url' => null, 'what' => null],
+        public ?bool $cloaking = null,
+        public ?string $linkify_words = null,
+        public ?string $og_description = null,
+        public ?string $body_tags = null,
+        public ?string $og_title = null,
+        public ?string $note = null,
+        public ?string $name = null,
+        public ?string $gtm_id = null,
+        public ?string $og_image = null,
+        public ?bool $block_bots = null,
+        public ?string $utm_content = null,
+        public ?bool $enabled = null,
+        public ?string $replacements = null,
+        public ?bool $deleted = null,
+        public ?int $workspace_id = null,
+        public ?bool $public_analytics = null,
+        public ?string $utm_source = null,
+        public ?string $slug = null,
+        public ?string $domain = null,
+        public ?bool $forward_params = null,
+        public ?string $utm_medium = null,
+        public ?string $head_tags = null,
+        public ?string $ga4_tag_id = null,
+        public ?string $utm_term = null,
+        public ?string $utm_campaign = null,
     ) {}
 
     /**
@@ -108,5 +109,57 @@ class Link implements JsonSerializable
     public function getOriginalUrl(): string
     {
         return $this->url;
+    }
+
+    /**
+     * Update a link
+     *
+     * @param array{
+     *     url?: string,
+     *     fb_pixel_id?: string,
+     *     hide_referrer?: bool,
+     *     expiry_datetime?: string,
+     *     expiry_destination?: string,
+     *     rules?: array{
+     *      matches: ?string,
+     *      percentage: ?int,
+     *      url: ?string,
+     *      what: ?string,
+     *     },
+     *     cloaking?: bool,
+     *     linkify_words?: string,
+     *     og_description?: string,
+     *     body_tags?: string,
+     *     og_title?: string,
+     *     note?: string,
+     *     name?: string,
+     *     gtm_id?: string,
+     *     og_image?: string,
+     *     block_bots?: bool,
+     *     utm_content?: string,
+     *     enabled?: bool,
+     *     replacements?: string,
+     *     public_analytics?: bool,
+     *     utm_source?: string,
+     *     slug?: string,
+     *     domain?: string,
+     *     forward_params?: bool,
+     *     utm_medium?: string,
+     *     head_tags?: string,
+     *     ga4_tag_id?: string,
+     *     utm_term?: string,
+     *     utm_campaign?: string
+     * } $data
+     *
+     * @throws LinklyException
+     */
+    public function update(array $data): Link
+    {
+        return app('linkly.client')->updateLink((string) $this->id, $data);
+    }
+
+    public function delete(): bool
+    {
+        return app('linkly.client')->deleteLink((string) $this->id);
     }
 }
