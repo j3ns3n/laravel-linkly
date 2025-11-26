@@ -4,6 +4,7 @@ namespace J3ns3n\LaravelLinkly\Middleware;
 
 use Closure;
 use GuzzleHttp\Promise\PromiseInterface;
+use GuzzleHttp\Psr7\Utils;
 use Psr\Http\Message\RequestInterface;
 
 /**
@@ -12,14 +13,16 @@ use Psr\Http\Message\RequestInterface;
 class LinklyAuthMiddleware
 {
     /**
-     * Default values to merge into request body
+     * LinklyAuthMiddleware constructor.
+     *
+     * @param  array<string, mixed>  $defaultValues
      */
-    protected array $defaultValues;
-
-    public function __construct(array $defaultValues = [])
-    {
-        $this->defaultValues = $defaultValues;
-    }
+    public function __construct(
+        /**
+         * Default values to merge into request body
+         */
+        protected array $defaultValues = []
+    ) {}
 
     /**
      * Create the middleware callable
@@ -51,6 +54,7 @@ class LinklyAuthMiddleware
     protected function isJsonRequest(RequestInterface $request): bool
     {
         $contentType = $request->getHeaderLine('Content-Type');
+
         return str_contains($contentType, 'application/json');
     }
 
@@ -60,6 +64,7 @@ class LinklyAuthMiddleware
     protected function isFormRequest(RequestInterface $request): bool
     {
         $contentType = $request->getHeaderLine('Content-Type');
+
         return str_contains($contentType, 'application/x-www-form-urlencoded') ||
             str_contains($contentType, 'multipart/form-data');
     }
@@ -83,7 +88,7 @@ class LinklyAuthMiddleware
 
         $queryParams['api_key'] = $this->defaultValues['api_key'] ?? '';
         // Only add workspace_id if the id is not already in the URL path
-        if (!str_contains($uri->getPath(), 'workspace/')) {
+        if (! str_contains($uri->getPath(), 'workspace/')) {
             $queryParams['workspace_id'] = $this->defaultValues['workspace_id'] ?? '';
         }
 
@@ -104,15 +109,21 @@ class LinklyAuthMiddleware
         $merged = array_merge($this->defaultValues, $decoded);
 
         $newBody = json_encode($merged);
-        $stream = \GuzzleHttp\Psr7\Utils::streamFor($newBody);
+        if ($newBody === false) {
+            $newBody = '';
+        }
+
+        $stream = Utils::streamFor($newBody);
 
         return $request
             ->withBody($stream)
-            ->withHeader('Content-Length', strlen($newBody));
+            ->withHeader('Content-Length', (string) strlen($newBody));
     }
 
     /**
      * Add values to form body (updates options)
+     *
+     * @param  array<string, mixed>  $options
      */
     protected function addFormBodyValues(RequestInterface $request, array &$options): RequestInterface
     {
@@ -125,6 +136,8 @@ class LinklyAuthMiddleware
 
     /**
      * Static factory method for easy use
+     *
+     * @param  array<string, mixed>  $values
      */
     public static function add(array $values): self
     {

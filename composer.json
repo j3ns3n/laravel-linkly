@@ -1,48 +1,56 @@
 {
-  "name": "j3ns3n/laravel-linkly",
-  "description": "Linkly API classes for Laravel",
-  "type": "library",
-  "require": {
-    "php": "^8.3",
-    "guzzlehttp/guzzle": "^7.10",
-    "illuminate/support": "^12.38"
-  },
-  "require-dev": {
-    "orchestra/testbench": "^10.6",
-    "phpunit/phpunit": "^12.4"
-  },
-  "license": "MIT",
-  "autoload": {
-    "psr-4": {
-      "J3ns3n\\LaravelLinkly\\": "src/"
+    "name": "j3ns3n/laravel-linkly",
+    "description": "Linkly API classes for Laravel",
+    "type": "library",
+    "require": {
+        "php": "^8.2",
+        "guzzlehttp/guzzle": "^7.10",
+        "illuminate/support": "^12.0"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.26",
+        "orchestra/testbench": "^10.6",
+        "phpstan/phpstan": "^2.1",
+        "phpunit/phpunit": "^12.4",
+        "rector/rector": "^2.2"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "J3ns3n\\LaravelLinkly\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "J3ns3n\\LaravelLinkly\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Jensen Larkin",
+            "email": "jensen.larkin@axitech.co"
+        }
+    ],
+    "config": {
+        "sort-packages": true,
+        "preferred-install": "dist",
+        "optimize-autoloader": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "J3ns3n\\LaravelLinkly\\LinklyServiceProvider"
+            ],
+            "aliases": {
+                "Linkly": "J3ns3n\\LaravelLinkly\\Facades\\Linkly"
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts": {
+        "test": "./vendor/bin/phpunit tests",
+        "pint": "./vendor/bin/pint",
+        "stan": "./vendor/bin/phpstan analyse -c phpstan.neon"
     }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "J3ns3n\\LaravelLinkly\\": "tests/"
-    }
-  },
-  "authors": [
-    {
-      "name": "Jensen Larkin",
-      "email": "jensen.larkin@axitech.co"
-    }
-  ],
-  "config": {
-    "sort-packages": true,
-    "preferred-install": "dist",
-    "optimize-autoloader": true
-  },
-  "extra": {
-    "laravel": {
-      "providers": [
-        "J3ns3n\\LaravelLinkly\\LinklyServiceProvider"
-      ],
-      "aliases": {
-        "Linkly": "J3ns3n\\LaravelLinkly\\Facades\\Linkly"
-      }
-    }
-  },
-  "minimum-stability": "dev",
-  "prefer-stable": true
 }

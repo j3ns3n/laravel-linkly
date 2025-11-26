@@ -3,33 +3,55 @@
 namespace J3ns3n\LaravelLinkly\Resources;
 
 use ArrayIterator;
-use Countable;
-use IteratorAggregate;
+use Illuminate\Support\Collection;
+use J3ns3n\LaravelLinkly\Helpers\LinkParser;
 use JsonSerializable;
 use Traversable;
 
-class LinkCollection implements IteratorAggregate, Countable, JsonSerializable
+/**
+ * @extends Collection<int, Link>
+ */
+class LinkCollection extends Collection implements JsonSerializable
 {
-    protected array $links = [];
+    /**
+     * @var array<int, Link>
+     */
+    protected $items = [];
 
+    /**
+     * @param  array<int, array<string, mixed>>  $links
+     */
     public function __construct(array $links)
     {
-        $this->links = array_map(fn($link) => new Link($link), $links);
+        $this->items = array_map(LinkParser::createLinkFromResponse(...), $links);
     }
 
     public function getIterator(): Traversable
     {
-        return new ArrayIterator($this->links);
+        return new ArrayIterator($this->items);
     }
 
     public function count(): int
     {
-        return count($this->links);
+        return count($this->items);
     }
 
+    /**
+     * @return array<int, Link>
+     */
     public function toArray(): array
     {
-        return array_map(fn(Link $link) => $link->toArray(), $this->links);
+        return $this->items;
+    }
+
+    /**
+     * Returns an array of arrays for serialization
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function toArrayOfArrays(): array
+    {
+        return array_map(fn (Link $link): array => $link->toArray(), $this->items);
     }
 
     public function jsonSerialize(): array
@@ -37,18 +59,8 @@ class LinkCollection implements IteratorAggregate, Countable, JsonSerializable
         return $this->toArray();
     }
 
-    public function first(): ?Link
-    {
-        return $this->links[0] ?? null;
-    }
-
-    public function last(): ?Link
-    {
-        return $this->links[count($this->links) - 1] ?? null;
-    }
-
     public function isEmpty(): bool
     {
-        return empty($this->links);
+        return $this->items === [];
     }
 }

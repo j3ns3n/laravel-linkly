@@ -5,8 +5,8 @@ namespace J3ns3n\LaravelLinkly\Client;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware;
 use J3ns3n\LaravelLinkly\Exceptions\LinklyException;
+use J3ns3n\LaravelLinkly\Helpers\LinkParser;
 use J3ns3n\LaravelLinkly\Middleware\LinklyAuthMiddleware;
 use J3ns3n\LaravelLinkly\Resources\Link;
 use J3ns3n\LaravelLinkly\Resources\LinkCollection;
@@ -14,30 +14,26 @@ use J3ns3n\LaravelLinkly\Resources\LinkCollection;
 class LinklyClient
 {
     protected Client $client;
-    protected string $apiKey;
-    protected string $workspaceId;
-    protected ?string $emailAddress;
-    protected array $retryConfig;
 
+    /**
+     * LinklyClient constructor.
+     *
+     * @param  array{'times': int, 'sleep': int}  $retryConfig
+     */
     public function __construct(
-        string $apiKey,
+        protected string $apiKey,
         string $baseUrl,
-        string $workspaceId,
-        string $emailAddress = null,
+        protected string $workspaceId,
+        protected array $retryConfig,
+        protected ?string $emailAddress,
         int $timeout = 30,
-        array $retryConfig = []
     ) {
-        $this->apiKey = $apiKey;
-        $this->retryConfig = $retryConfig;
-        $this->workspaceId = $workspaceId;
-        $this->emailAddress = $emailAddress;
-
         $stack = HandlerStack::create();
 
         $stack->push(new LinklyAuthMiddleware([
-            'workspace_id' => $workspaceId,
-            'api_key' => $apiKey,
-            'email' => $emailAddress ?? null,
+            'workspace_id' => $this->workspaceId,
+            'api_key' => $this->apiKey,
+            'email' => $this->emailAddress ?? null,
         ]));
 
         $this->client = new Client([
@@ -48,7 +44,46 @@ class LinklyClient
     }
 
     /**
-     * Create a new short link
+     * Create a new link
+     *
+     * @param array{
+     *     url: string,
+     *     fb_pixel_id?: string,
+     *     hide_referrer?: bool,
+     *     expiry_datetime?: string,
+     *     expiry_destination?: string,
+     *     rules?: array{
+     *      matches: ?string,
+     *      percentage: ?int,
+     *      url: ?string,
+     *      what: ?string,
+     *     },
+     *     cloaking?: bool,
+     *     linkify_words?: string,
+     *     og_description?: string,
+     *     body_tags?: string,
+     *     og_title?: string,
+     *     note?: string,
+     *     name?: string,
+     *     gtm_id?: string,
+     *     og_image?: string,
+     *     block_bots?: bool,
+     *     utm_content?: string,
+     *     enabled?: bool,
+     *     replacements?: string,
+     *     public_analytics?: bool,
+     *     utm_source?: string,
+     *     slug?: string,
+     *     domain?: string,
+     *     forward_params?: bool,
+     *     utm_medium?: string,
+     *     head_tags?: string,
+     *     ga4_tag_id?: string,
+     *     utm_term?: string,
+     *     utm_campaign?: string
+     * } $data
+     *
+     * @throws LinklyException
      */
     public function createLink(array $data): Link
     {
@@ -57,77 +92,81 @@ class LinklyClient
                 'json' => $data,
             ]);
 
-            $body = json_decode($response->getBody()->getContents(), true);
-
-            return new Link($body);
-        } catch (GuzzleException $e) {
-            throw new LinklyException('Failed to create link: ' . $e->getMessage(), $e->getCode(), $e);
+            return LinkParser::createLinkFromResponse($response);
+        } catch (GuzzleException $guzzleException) {
+            throw new LinklyException('Failed to create link: '.$guzzleException->getMessage(), $guzzleException->getCode(), $guzzleException);
         }
     }
 
     /**
      * Get a link by ID
+     *
+     * @throws LinklyException
      */
     public function getLink(string $linkId): Link
     {
         try {
-            $response = $this->client->get("link/{$linkId}");
+            $response = $this->client->get('link/'.$linkId);
 
-            $body = json_decode($response->getBody()->getContents(), true);
-
-            return new Link($body);
-        } catch (GuzzleException $e) {
-            throw new LinklyException('Failed to retrieve link: ' . $e->getMessage(), $e->getCode(), $e);
+            return LinkParser::createLinkFromResponse($response);
+        } catch (GuzzleException $guzzleException) {
+            throw new LinklyException('Failed to retrieve link: '.$guzzleException->getMessage(), $guzzleException->getCode(), $guzzleException);
         }
     }
 
     /**
      * List all links
+     *
+     * @throws LinklyException
      */
     public function listLinks(): LinkCollection
     {
         try {
-            $response = $this->client->get("workspace/{$this->workspaceId}/list_links");
+            $response = $this->client->get(sprintf('workspace/%s/list_links', $this->workspaceId));
 
             $body = json_decode($response->getBody()->getContents(), true);
 
             return new LinkCollection($body['links'] ?? []);
-        } catch (GuzzleException $e) {
-            throw new LinklyException('Failed to list links: ' . $e->getMessage(), $e->getCode(), $e);
+        } catch (GuzzleException $guzzleException) {
+            throw new LinklyException('Failed to list links: '.$guzzleException->getMessage(), $guzzleException->getCode(), $guzzleException);
         }
     }
 
     /**
      * Update a link
+     *
+     * @param  string[]  $data
+     *
+     * @throws LinklyException
      */
     public function updateLink(string $linkId, array $data): Link
     {
         try {
-            $response = $this->client->post("link", [
+            $response = $this->client->post('link', [
                 'json' => ['id' => $linkId, ...$data],
             ]);
 
-            $body = json_decode($response->getBody()->getContents(), true);
-
-            return new Link($body);
-        } catch (GuzzleException $e) {
-            throw new LinklyException('Failed to update link: ' . $e->getMessage(), $e->getCode(), $e);
+            return LinkParser::createLinkFromResponse($response);
+        } catch (GuzzleException $guzzleException) {
+            throw new LinklyException('Failed to update link: '.$guzzleException->getMessage(), $guzzleException->getCode(), $guzzleException);
         }
     }
 
     /**
      * Delete a link
+     *
+     * @throws LinklyException
      */
     public function deleteLink(string $linkId): bool
     {
         try {
-            $this->client->delete("workspace/{$this->workspaceId}/links", [
+            $this->client->delete(sprintf('workspace/%s/links', $this->workspaceId), [
                 'json' => ['ids' => [$linkId]],
             ]);
 
             return true;
-        } catch (GuzzleException $e) {
-            throw new LinklyException('Failed to delete link: ' . $e->getMessage(), $e->getCode(), $e);
+        } catch (GuzzleException $guzzleException) {
+            throw new LinklyException('Failed to delete link: '.$guzzleException->getMessage(), $guzzleException->getCode(), $guzzleException);
         }
     }
 }

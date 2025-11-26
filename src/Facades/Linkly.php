@@ -3,14 +3,15 @@
 namespace J3ns3n\LaravelLinkly\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use J3ns3n\LaravelLinkly\Resources\Link;
+use J3ns3n\LaravelLinkly\Resources\LinkCollection;
 
 /**
- * @method static \J3ns3n\LaravelLinkly\Resources\Link createLink(array $data)
- * @method static \J3ns3n\LaravelLinkly\Resources\Link getLink(string $linkId)
- * @method static \J3ns3n\LaravelLinkly\Resources\LinkCollection listLinks(array $params = [])
- * @method static \J3ns3n\LaravelLinkly\Resources\Link updateLink(string $linkId, array $data)
+ * @method static Link createLink(string[] $data)
+ * @method static Link getLink(string $linkId)
+ * @method static LinkCollection listLinks(string[] $params = [])
+ * @method static Link updateLink(string $linkId, string[] $data)
  * @method static bool deleteLink(string $linkId)
- * @method static array getLinkAnalytics(string $linkId, array $params = [])
  *
  * @see \J3ns3n\LaravelLinkly\Client\LinklyClient
  */

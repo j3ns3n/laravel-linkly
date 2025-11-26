@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace J3ns3n\LaravelLinkly\Tests\Unit;
 
 use GuzzleHttp\Client;
@@ -10,29 +12,39 @@ use J3ns3n\LaravelLinkly\Client\LinklyClient;
 use J3ns3n\LaravelLinkly\Exceptions\LinklyException;
 use PHPUnit\Framework\TestCase;
 
-class LinklyClientTest extends TestCase
+final class LinklyClientTest extends TestCase
 {
+    /**
+     * @param  \GuzzleHttp\Psr7\Response[]  $responses
+     */
     protected function createMockClient(array $responses): LinklyClient
     {
         $mock = new MockHandler($responses);
         $handlerStack = HandlerStack::create($mock);
         $client = new Client(['handler' => $handlerStack]);
 
-        $linklyClient = new LinklyClient('test-api-key', 'https://api.linkly.com/v1', 'test-workspace-id');
+        $linklyClient = new LinklyClient(
+            apiKey: 'test-api-key',
+            baseUrl: 'https://api.linkly.com/v1',
+            workspaceId: 'test-workspace-id',
+            retryConfig: [
+                'times' => 1,
+                'sleep' => 0,
+            ],
+            emailAddress: '');
 
         // Use reflection to inject the mock client
         $reflection = new \ReflectionClass($linklyClient);
         $property = $reflection->getProperty('client');
-        $property->setAccessible(true);
         $property->setValue($linklyClient, $client);
 
         return $linklyClient;
     }
 
-    public function test_create_link_success()
+    public function test_create_link_success(): void
     {
         $mockResponse = new Response(200, [], json_encode([
-            'id' => 'abc123',
+            'id' => 123,
             'full_url' => 'https://lnk.ly/abc123',
             'url' => 'https://example.com',
         ]));
@@ -43,27 +55,27 @@ class LinklyClientTest extends TestCase
             'url' => 'https://example.com',
         ]);
 
-        $this->assertEquals('abc123', $link->getId());
-        $this->assertEquals('https://lnk.ly/abc123', $link->getShortUrl());
-        $this->assertEquals('https://example.com', $link->getOriginalUrl());
+        $this->assertSame(123, $link->getId());
+        $this->assertSame('https://lnk.ly/abc123', $link->getShortUrl());
+        $this->assertSame('https://example.com', $link->getOriginalUrl());
     }
 
-    public function test_get_link_success()
+    public function test_get_link_success(): void
     {
         $mockResponse = new Response(200, [], json_encode([
-            'id' => 'abc123',
+            'id' => 123,
             'full_url' => 'https://lnk.ly/abc123',
             'url' => 'https://example.com',
         ]));
 
         $client = $this->createMockClient([$mockResponse]);
 
-        $link = $client->getLink('abc123');
+        $link = $client->getLink('123');
 
-        $this->assertEquals('abc123', $link->getId());
+        $this->assertSame(123, $link->getId());
     }
 
-    public function test_create_link_throws_exception_on_error()
+    public function test_create_link_throws_exception_on_error(): void
     {
         $this->expectException(LinklyException::class);
 
@@ -78,17 +90,17 @@ class LinklyClientTest extends TestCase
         ]);
     }
 
-    public function test_list_links_returns_collection()
+    public function test_list_links_returns_collection(): void
     {
         $mockResponse = new Response(200, [], json_encode([
             'links' => [
                 [
-                    'id' => 'link1',
+                    'id' => 123,
                     'full_url' => 'https://lnk.ly/link1',
                     'url' => 'https://example.com/1',
                 ],
                 [
-                    'id' => 'link2',
+                    'id' => 456,
                     'full_url' => 'https://lnk.ly/link2',
                     'url' => 'https://example.com/2',
                 ],
@@ -100,7 +112,7 @@ class LinklyClientTest extends TestCase
         $links = $client->listLinks();
 
         $this->assertCount(2, $links);
-        $this->assertEquals('link1', $links->first()->getId());
-        $this->assertEquals('link2', $links->last()->getId());
+        $this->assertEquals(123, $links->first()->getId());
+        $this->assertEquals(456, $links->last()->getId());
     }
 }

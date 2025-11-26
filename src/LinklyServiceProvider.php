@@ -16,16 +16,14 @@ class LinklyServiceProvider extends ServiceProvider
             __DIR__.'/Config/linkly.php', 'linkly'
         );
 
-        $this->app->singleton('linkly', function ($app) {
-            return new LinklyClient(
-                config('linkly.api_key'),
-                config('linkly.api_url'),
-                config('linkly.workspace_id'),
-                config('linkly.email'),
-                config('linkly.timeout'),
-                config('linkly.retry')
-            );
-        });
+        $this->app->singleton('linkly', fn ($app): \J3ns3n\LaravelLinkly\Client\LinklyClient => new LinklyClient(
+            config('linkly.api_key'),
+            config('linkly.api_url'),
+            config('linkly.workspace_id'),
+            config('linkly.retry'),
+            config('linkly.email'),
+            config('linkly.timeout'),
+        ));
 
         $this->app->alias('linkly', LinklyClient::class);
     }

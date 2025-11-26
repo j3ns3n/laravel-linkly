@@ -1,18 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace J3ns3n\LaravelLinkly\Tests\Feature;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Config;
 use J3ns3n\LaravelLinkly\Facades\Linkly;
 use J3ns3n\LaravelLinkly\LinklyServiceProvider;
 use Orchestra\Testbench\TestCase;
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Response;
 use ReflectionClass;
 
-class LinklyFeatureTest extends TestCase
+final class LinklyFeatureTest extends TestCase
 {
     protected bool $useLiveApi;
 
@@ -23,7 +25,7 @@ class LinklyFeatureTest extends TestCase
         Config::set('linkly.api_key', env('LINKLY_API_KEY', 'linkly-api-key'));
         Config::set('linkly.api_url', env('LINKLY_API_URL', 'https://app.linklyhq.com/api/v1/'));
         Config::set('linkly.workspace_id', env('LINKLY_WORKSPACE_ID', 'linkly-workspace-id'));
-        Config::set('linkly.email', env('LINKLY_EMAIL_ADDR', null));
+        Config::set('linkly.email', env('LINKLY_EMAIL_ADDR'));
         Config::set('linkly.timeout', env('LINKLY_TIMEOUT', 30));
         Config::set('linkly.retry', [
             'times' => env('LINKLY_RETRY_TIMES', 1),
@@ -37,6 +39,9 @@ class LinklyFeatureTest extends TestCase
         return env('TEST_LIVE_API') && env('LINKLY_API_KEY') && env('LINKLY_API_URL') && env('LINKLY_WORKSPACE_ID');
     }
 
+    /**
+     * @param  Response[]  $responses
+     */
     protected function mockHttpResponses(array $responses)
     {
         $mock = new MockHandler($responses);
@@ -45,22 +50,24 @@ class LinklyFeatureTest extends TestCase
         $linkly = $this->app->make('linkly');
         $reflection = new ReflectionClass($linkly);
         $property = $reflection->getProperty('client');
-        $property->setAccessible(true);
         $property->setValue($linkly, $client);
     }
 
+    /**
+     * @param  Response[]  $responses
+     */
     protected function maybeMockHttpResponses(array $responses)
     {
-        if (!$this->useLiveApi) {
+        if (! $this->useLiveApi) {
             $this->mockHttpResponses($responses);
         }
     }
 
-    public function test_create_link()
+    public function test_create_link(): void
     {
         $this->maybeMockHttpResponses([
             new Response(200, [], json_encode([
-                'id' => 'abc123',
+                'id' => 123,
                 'url' => 'https://lnk.ly/abc123',
                 'full_url' => 'https://example.com',
             ])),
@@ -72,13 +79,13 @@ class LinklyFeatureTest extends TestCase
         $this->assertNotNull($link->getOriginalUrl());
     }
 
-    public function test_list_links()
+    public function test_list_links(): void
     {
         $this->maybeMockHttpResponses([
             new Response(200, [], json_encode([
                 'links' => [
-                    ['id' => 'abc123', 'url' => 'https://lnk.ly/abc123', 'full_url' => 'https://example.com'],
-                    ['id' => 'def456', 'url' => 'https://lnk.ly/def456', 'full_url' => 'https://another.com'],
+                    ['id' => 123, 'url' => 'https://lnk.ly/abc123', 'full_url' => 'https://example.com'],
+                    ['id' => 456, 'url' => 'https://lnk.ly/def456', 'full_url' => 'https://another.com'],
                 ],
             ])),
         ]);
