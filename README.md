@@ -1,6 +1,10 @@
-# Linkly Laravel Package
+# Laravel Linkly
+## A Laravel Package for the Linkly API
 
-A Laravel package for interacting with the Linkly API.
+![Release Version](https://img.shields.io/github/v/release/j3ns3n/laravel-linkly?logo=Github&label=Release)
+
+![PHP Version](https://img.shields.io/packagist/dependency-v/j3ns3n/laravel-linkly/php?logo=php)
+![Laravel Version](https://img.shields.io/packagist/dependency-v/j3ns3n/laravel-linkly/illuminate/support?label=Laravel&logo=laravel)
 
 ## Installation
 
