@@ -26,6 +26,7 @@ class LinklyServiceProvider extends ServiceProvider
         ));
 
         $this->app->alias('linkly', LinklyClient::class);
+        $this->app->alias('linkly', 'linkly.client');
     }
 
     /**

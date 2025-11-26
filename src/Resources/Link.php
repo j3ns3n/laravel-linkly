@@ -158,6 +158,9 @@ class Link implements JsonSerializable
         return app('linkly.client')->updateLink((string) $this->id, $data);
     }
 
+    /**
+     * @throws LinklyException
+     */
     public function delete(): bool
     {
         return app('linkly.client')->deleteLink((string) $this->id);
