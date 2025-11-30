@@ -10,8 +10,10 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use J3ns3n\LaravelLinkly\Client\LinklyClient;
 use J3ns3n\LaravelLinkly\Exceptions\LinklyException;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(LinklyClient::class)]
 final class LinklyClientTest extends TestCase
 {
     /**

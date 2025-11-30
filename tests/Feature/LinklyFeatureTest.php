@@ -9,11 +9,15 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Config;
+use J3ns3n\LaravelLinkly\Client\LinklyClient;
 use J3ns3n\LaravelLinkly\Facades\Linkly;
 use J3ns3n\LaravelLinkly\LinklyServiceProvider;
 use Orchestra\Testbench\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use ReflectionClass;
 
+#[CoversClass(LinklyClient::class)]
 final class LinklyFeatureTest extends TestCase
 {
     protected bool $useLiveApi;
