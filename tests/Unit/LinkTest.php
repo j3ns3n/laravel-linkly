@@ -7,8 +7,10 @@ namespace J3ns3n\LaravelLinkly\Unit;
 use J3ns3n\LaravelLinkly\Exceptions\LinklyException;
 use J3ns3n\LaravelLinkly\Resources\Link;
 use Mockery;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Link::class)]
 class LinkTest extends TestCase
 {
     protected function tearDown(): void

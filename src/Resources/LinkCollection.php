@@ -26,11 +26,13 @@ class LinkCollection extends Collection implements JsonSerializable
         $this->items = array_map(LinkParser::createLinkFromResponse(...), $links);
     }
 
+    #[\Override]
     public function getIterator(): Traversable
     {
         return new ArrayIterator($this->items);
     }
 
+    #[\Override]
     public function count(): int
     {
         return count($this->items);
@@ -39,6 +41,7 @@ class LinkCollection extends Collection implements JsonSerializable
     /**
      * @return array<int, Link>
      */
+    #[\Override]
     public function toArray(): array
     {
         return $this->items;
@@ -54,11 +57,13 @@ class LinkCollection extends Collection implements JsonSerializable
         return array_map(fn (Link $link): array => $link->toArray(), $this->items);
     }
 
+    #[\Override]
     public function jsonSerialize(): array
     {
         return $this->toArray();
     }
 
+    #[\Override]
     public function isEmpty(): bool
     {
         return $this->items === [];

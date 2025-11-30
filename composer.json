@@ -11,8 +11,9 @@
         "laravel/pint": "^1.26",
         "orchestra/testbench": "^10.6",
         "phpstan/phpstan": "^2.1",
-        "phpunit/phpunit": "^12.4",
-        "rector/rector": "^2.2"
+        "phpunit/phpunit": "^11.5",
+        "rector/rector": "^2.2",
+        "vimeo/psalm": "^6.13"
     },
     "license": "MIT",
     "autoload": {
@@ -51,6 +52,7 @@
     "scripts": {
         "test": "./vendor/bin/phpunit tests",
         "pint": "./vendor/bin/pint",
-        "stan": "./vendor/bin/phpstan analyse -c phpstan.neon"
+        "stan": "./vendor/bin/phpstan analyse -c phpstan.neon",
+        "psalm": "./vendor/bin/psalm"
     }
 }

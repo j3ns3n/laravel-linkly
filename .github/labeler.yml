@@ -1,0 +1,23 @@
+documentation:
+  - changed-files:
+      - any-glob-to-any-file: ['*.md', 'docs/**/*']
+
+tests:
+  - changed-files:
+      - any-glob-to-any-file: ['tests/**/*']
+
+dependencies:
+  - changed-files:
+      - any-glob-to-any-file: ['composer.json', 'composer.lock']
+
+config:
+  - changed-files:
+      - any-glob-to-any-file: ['config/**/*']
+
+src:
+  - changed-files:
+      - any-glob-to-any-file: ['src/**/*']
+
+github-actions:
+  - changed-files:
+      - any-glob-to-any-file: ['.github/**/*']
