@@ -13,6 +13,7 @@ use J3ns3n\LaravelLinkly\Exceptions\LinklyException;
 use J3ns3n\LaravelLinkly\Helpers\LinkParser;
 use J3ns3n\LaravelLinkly\Middleware\LinklyAuthMiddleware;
 use J3ns3n\LaravelLinkly\Resources\Link;
+use J3ns3n\LaravelLinkly\Resources\LinkCollection;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -20,6 +21,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(LinklyAuthMiddleware::class)]
 #[CoversClass(LinkParser::class)]
 #[CoversClass(Link::class)]
+#[CoversClass(LinkCollection::class)]
 final class LinklyClientTest extends TestCase
 {
     /**
