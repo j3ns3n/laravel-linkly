@@ -10,13 +10,14 @@ class LinklyServiceProvider extends ServiceProvider
     /**
      * Register services.
      */
+     #[\Override]
     public function register(): void
     {
         $this->mergeConfigFrom(
             __DIR__.'/Config/linkly.php', 'linkly'
         );
 
-        $this->app->singleton('linkly', fn ($app): \J3ns3n\LaravelLinkly\Client\LinklyClient => new LinklyClient(
+        $this->app->singleton('linkly', fn ($app): LinklyClient => new LinklyClient(
             config('linkly.api_key'),
             config('linkly.api_url'),
             config('linkly.workspace_id'),

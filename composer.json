@@ -12,7 +12,8 @@
         "orchestra/testbench": "^10.6",
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^12.4",
-        "rector/rector": "^2.2"
+        "rector/rector": "^2.2",
+        "vimeo/psalm": "^6.13"
     },
     "license": "MIT",
     "autoload": {
