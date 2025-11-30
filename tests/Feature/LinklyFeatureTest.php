@@ -15,6 +15,7 @@ use J3ns3n\LaravelLinkly\Helpers\LinkParser;
 use J3ns3n\LaravelLinkly\LinklyServiceProvider;
 use J3ns3n\LaravelLinkly\Middleware\LinklyAuthMiddleware;
 use J3ns3n\LaravelLinkly\Resources\Link;
+use J3ns3n\LaravelLinkly\Resources\LinkCollection;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use ReflectionClass;
@@ -25,6 +26,7 @@ use ReflectionClass;
 #[CoversClass(LinklyServiceProvider::class)]
 #[CoversClass(LinklyAuthMiddleware::class)]
 #[CoversClass(Link::class)]
+#[CoversClass(LinkCollection::class)]
 final class LinklyFeatureTest extends TestCase
 {
     protected bool $useLiveApi;
