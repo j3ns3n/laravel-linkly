@@ -11,13 +11,20 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Config;
 use J3ns3n\LaravelLinkly\Client\LinklyClient;
 use J3ns3n\LaravelLinkly\Facades\Linkly;
+use J3ns3n\LaravelLinkly\Helpers\LinkParser;
 use J3ns3n\LaravelLinkly\LinklyServiceProvider;
+use J3ns3n\LaravelLinkly\Middleware\LinklyAuthMiddleware;
+use J3ns3n\LaravelLinkly\Resources\Link;
 use Orchestra\Testbench\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\CoversNothing;
 use ReflectionClass;
 
 #[CoversClass(LinklyClient::class)]
+#[CoversClass(Linkly::class)]
+#[CoversClass(LinkParser::class)]
+#[CoversClass(LinklyServiceProvider::class)]
+#[CoversClass(LinklyAuthMiddleware::class)]
+#[CoversClass(Link::class)]
 final class LinklyFeatureTest extends TestCase
 {
     protected bool $useLiveApi;

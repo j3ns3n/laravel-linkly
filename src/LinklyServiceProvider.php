@@ -10,7 +10,7 @@ class LinklyServiceProvider extends ServiceProvider
     /**
      * Register services.
      */
-     #[\Override]
+    #[\Override]
     public function register(): void
     {
         $this->mergeConfigFrom(

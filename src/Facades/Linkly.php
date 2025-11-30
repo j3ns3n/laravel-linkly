@@ -20,7 +20,7 @@ class Linkly extends Facade
     /**
      * Get the registered name of the component.
      */
-     #[\Override]
+    #[\Override]
     protected static function getFacadeAccessor(): string
     {
         return 'linkly';

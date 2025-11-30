@@ -91,7 +91,7 @@ class Link implements JsonSerializable
     /**
      * @return array<string, mixed>
      */
-     #[\Override]
+    #[\Override]
     public function jsonSerialize(): array
     {
         return $this->toArray();

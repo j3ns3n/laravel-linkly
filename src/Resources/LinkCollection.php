@@ -41,7 +41,7 @@ class LinkCollection extends Collection implements JsonSerializable
     /**
      * @return array<int, Link>
      */
-     #[\Override]
+    #[\Override]
     public function toArray(): array
     {
         return $this->items;
