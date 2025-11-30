@@ -25,7 +25,6 @@ use ReflectionClass;
 #[CoversClass(LinklyServiceProvider::class)]
 #[CoversClass(LinklyAuthMiddleware::class)]
 #[CoversClass(Link::class)]
-#[Use]
 final class LinklyFeatureTest extends TestCase
 {
     protected bool $useLiveApi;
