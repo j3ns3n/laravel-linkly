@@ -52,6 +52,7 @@
     "scripts": {
         "test": "./vendor/bin/phpunit tests",
         "pint": "./vendor/bin/pint",
-        "stan": "./vendor/bin/phpstan analyse -c phpstan.neon"
+        "stan": "./vendor/bin/phpstan analyse -c phpstan.neon",
+        "psalm": "./vendor/bin/psalm"
     }
 }
