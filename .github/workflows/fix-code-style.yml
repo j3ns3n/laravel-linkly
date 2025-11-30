@@ -33,7 +33,7 @@ jobs:
         run: composer pint
 
       - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "style: fix code style"
           commit_options: '--no-verify'
