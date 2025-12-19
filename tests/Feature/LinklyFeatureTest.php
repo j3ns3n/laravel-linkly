@@ -40,6 +40,7 @@ final class LinklyFeatureTest extends TestCase
         Config::set('linkly.workspace_id', env('LINKLY_WORKSPACE_ID', 'linkly-workspace-id'));
         Config::set('linkly.email', env('LINKLY_EMAIL_ADDR'));
         Config::set('linkly.timeout', env('LINKLY_TIMEOUT', 30));
+        Config::set('linkly.default_domain', env('LINKLY_DEFAULT_DOMAIN'));
         Config::set('linkly.retry', [
             'times' => env('LINKLY_RETRY_TIMES', 1),
             'sleep' => env('LINKLY_RETRY_SLEEP', 0),

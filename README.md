@@ -69,6 +69,30 @@ class LinkController extends Controller
 }
 ```
 
+### Using the LinkBuilder
+
+You can use the builder pattern for more advanced link creation:
+
+```php
+use J3ns3n\LaravelLinkly\Facades\Linkly;
+
+$link = Linkly::build('https://example.com')
+    ->name('My Example Link')
+    ->slug('my-slug')
+    ->domain('custom.domain')
+    ->cloaking()
+    ->blockBots()
+    ->forwardParams(false)
+    ->webhook('https://webhook.site/abc')
+    ->utm('newsletter', 'email', 'launch')
+    ->openGraph('OG Title', 'OG Desc', 'https://img.com/og.png')
+    ->expires('2025-12-31T23:59:59Z', 'https://expired.com')
+    ->rules(['matches' => 'US', 'percentage' => 50, 'url' => 'https://us.com', 'what' => 'geo'])
+    ->create();
+
+// The returned $link is an instance of J3ns3n\LaravelLinkly\Resources\Link
+```
+
 ### Available Methods
 
 ```php
