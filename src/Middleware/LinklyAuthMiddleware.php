@@ -44,6 +44,9 @@ class LinklyAuthMiddleware
                 $request = $this->addFormBodyValues($request, $options);
             }
 
+            // Remove all null values from the request
+            $request = $this->removeNullValuesFromRequest($request);
+
             return $handler($request, $options);
         };
     }
@@ -142,5 +145,30 @@ class LinklyAuthMiddleware
     public static function add(array $values): self
     {
         return new self($values);
+    }
+
+    /**
+     * Remove all null values from the request body (for JSON/form requests)
+     */
+    protected function removeNullValuesFromRequest(RequestInterface $request): RequestInterface
+    {
+        if ($this->isJsonRequest($request)) {
+            $body = $request->getBody()->getContents();
+            $decoded = json_decode($body, true) ?? [];
+            $filtered = array_filter($decoded, fn ($v) => $v !== null);
+            $newBody = json_encode($filtered) ?: '';
+            $stream = Utils::streamFor($newBody);
+
+            return $request
+                ->withBody($stream)
+                ->withHeader('Content-Length', (string) strlen($newBody));
+        }
+        // For form requests, nulls should not be present, but filter if needed
+        if ($this->isFormRequest($request)) {
+            // No-op: form data is handled via $options, not request body
+            return $request;
+        }
+
+        return $request;
     }
 }
