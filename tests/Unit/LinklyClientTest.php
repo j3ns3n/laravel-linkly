@@ -41,6 +41,7 @@ final class LinklyClientTest extends TestCase
                 'times' => 1,
                 'sleep' => 0,
             ],
+            defaultDomain: null,
             emailAddress: '');
 
         // Use reflection to inject the mock client

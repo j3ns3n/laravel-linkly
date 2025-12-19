@@ -18,12 +18,13 @@ class LinklyServiceProvider extends ServiceProvider
         );
 
         $this->app->singleton('linkly', fn ($app): LinklyClient => new LinklyClient(
-            config('linkly.api_key'),
-            config('linkly.api_url'),
-            config('linkly.workspace_id'),
-            config('linkly.retry'),
-            config('linkly.email'),
-            config('linkly.timeout'),
+            apiKey: config('linkly.api_key'),
+            baseUrl: config('linkly.api_url'),
+            workspaceId: config('linkly.workspace_id'),
+            retryConfig: config('linkly.retry'),
+            defaultDomain: config('linkly.default_domain'),
+            emailAddress: config('linkly.email'),
+            timeout: config('linkly.timeout'),
         ));
 
         $this->app->alias('linkly', LinklyClient::class);

@@ -5,6 +5,7 @@ namespace J3ns3n\LaravelLinkly\Client;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\HandlerStack;
+use J3ns3n\LaravelLinkly\Builders\LinkBuilder;
 use J3ns3n\LaravelLinkly\Exceptions\LinklyException;
 use J3ns3n\LaravelLinkly\Helpers\LinkParser;
 use J3ns3n\LaravelLinkly\Middleware\LinklyAuthMiddleware;
@@ -25,6 +26,7 @@ class LinklyClient
         string $baseUrl,
         protected string $workspaceId,
         protected array $retryConfig,
+        protected ?string $defaultDomain,
         protected ?string $emailAddress,
         int $timeout = 30,
     ) {
@@ -34,6 +36,7 @@ class LinklyClient
             'workspace_id' => $this->workspaceId,
             'api_key' => $this->apiKey,
             'email' => $this->emailAddress ?? null,
+            'domain' => $this->defaultDomain ?? null,
         ]));
 
         $this->client = new Client([
@@ -46,42 +49,7 @@ class LinklyClient
     /**
      * Create a new link
      *
-     * @param array{
-     *     url: string,
-     *     fb_pixel_id?: string,
-     *     hide_referrer?: bool,
-     *     expiry_datetime?: string,
-     *     expiry_destination?: string,
-     *     rules?: array{
-     *      matches: ?string,
-     *      percentage: ?int,
-     *      url: ?string,
-     *      what: ?string,
-     *     },
-     *     cloaking?: bool,
-     *     linkify_words?: string,
-     *     og_description?: string,
-     *     body_tags?: string,
-     *     og_title?: string,
-     *     note?: string,
-     *     name?: string,
-     *     gtm_id?: string,
-     *     og_image?: string,
-     *     block_bots?: bool,
-     *     utm_content?: string,
-     *     enabled?: bool,
-     *     replacements?: string,
-     *     public_analytics?: bool,
-     *     utm_source?: string,
-     *     slug?: string,
-     *     domain?: string,
-     *     forward_params?: bool,
-     *     utm_medium?: string,
-     *     head_tags?: string,
-     *     ga4_tag_id?: string,
-     *     utm_term?: string,
-     *     utm_campaign?: string
-     * } $data
+     * @param  array<string, mixed>  $data
      *
      * @throws LinklyException
      */
@@ -169,7 +137,8 @@ class LinklyClient
      *     head_tags?: string,
      *     ga4_tag_id?: string,
      *     utm_term?: string,
-     *     utm_campaign?: string
+     *     utm_campaign?: string,
+     *     webhooks?: array<string>
      * } $data
      *
      * @throws LinklyException
@@ -203,5 +172,10 @@ class LinklyClient
         } catch (GuzzleException $guzzleException) {
             throw new LinklyException('Failed to delete link: '.$guzzleException->getMessage(), $guzzleException->getCode(), $guzzleException);
         }
+    }
+
+    public function build(string $url): LinkBuilder
+    {
+        return new LinkBuilder($this, $url);
     }
 }
