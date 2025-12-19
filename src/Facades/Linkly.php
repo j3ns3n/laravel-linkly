@@ -3,7 +3,6 @@
 namespace J3ns3n\LaravelLinkly\Facades;
 
 use Illuminate\Support\Facades\Facade;
-use J3ns3n\LaravelLinkly\Builders\LinkBuilder;
 use J3ns3n\LaravelLinkly\Resources\Link;
 use J3ns3n\LaravelLinkly\Resources\LinkCollection;
 

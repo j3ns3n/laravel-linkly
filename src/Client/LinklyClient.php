@@ -49,7 +49,7 @@ class LinklyClient
     /**
      * Create a new link
      *
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      *
      * @throws LinklyException
      */
@@ -178,5 +178,4 @@ class LinklyClient
     {
         return new LinkBuilder($this, $url);
     }
-
 }

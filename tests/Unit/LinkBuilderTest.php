@@ -6,11 +6,11 @@ namespace J3ns3n\LaravelLinkly\Unit;
 
 use J3ns3n\LaravelLinkly\Builders\LinkBuilder;
 use J3ns3n\LaravelLinkly\Client\LinklyClient;
-use J3ns3n\LaravelLinkly\Resources\Link;
 use J3ns3n\LaravelLinkly\Exceptions\LinklyException;
-use PHPUnit\Framework\TestCase;
+use J3ns3n\LaravelLinkly\Resources\Link;
 use Mockery;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(LinkBuilder::class)]
 class LinkBuilderTest extends TestCase
@@ -60,12 +60,13 @@ class LinkBuilderTest extends TestCase
         ];
         $mockClient->shouldReceive('createLink')
             ->once()
-            ->with(Mockery::on(function($data) use ($expected) {
+            ->with(Mockery::on(function ($data) use ($expected) {
                 foreach ($expected as $key => $value) {
-                    if (!isset($data[$key]) || $data[$key] !== $value) {
+                    if (! isset($data[$key]) || $data[$key] !== $value) {
                         return false;
                     }
                 }
+
                 return true;
             }))
             ->andReturn($mockLink);
