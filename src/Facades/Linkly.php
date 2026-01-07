@@ -12,6 +12,7 @@ use J3ns3n\LaravelLinkly\Resources\LinkCollection;
  * @method static LinkCollection listLinks(string[] $params = [])
  * @method static Link updateLink(string $linkId, string[] $data)
  * @method static bool deleteLink(string $linkId)
+ * @method static LinkBuilder build(string $longUrl)
  *
  * @see \J3ns3n\LaravelLinkly\Client\LinklyClient
  */

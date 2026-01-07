@@ -176,8 +176,6 @@ class LinklyClient
 
     /**
      * Start building a new link
-     * @param  string  $url
-     * @return LinkBuilder
      */
     public function build(string $url): LinkBuilder
     {
