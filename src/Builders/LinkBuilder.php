@@ -2,12 +2,15 @@
 
 namespace J3ns3n\LaravelLinkly\Builders;
 
+use Illuminate\Support\Traits\Dumpable;
 use J3ns3n\LaravelLinkly\Client\LinklyClient;
 use J3ns3n\LaravelLinkly\Exceptions\LinklyException;
 use J3ns3n\LaravelLinkly\Resources\Link;
 
 class LinkBuilder
 {
+    use Dumpable;
+
     /**
      * @var array<string, mixed>
      */
