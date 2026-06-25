@@ -25,7 +25,7 @@ use PHPUnit\Framework\TestCase;
 final class LinklyClientTest extends TestCase
 {
     /**
-     * @param  \GuzzleHttp\Psr7\Response[]  $responses
+     * @param  Response[]  $responses
      */
     protected function createMockClient(array $responses): LinklyClient
     {

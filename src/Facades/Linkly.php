@@ -4,6 +4,7 @@ namespace J3ns3n\LaravelLinkly\Facades;
 
 use Illuminate\Support\Facades\Facade;
 use J3ns3n\LaravelLinkly\Builders\LinkBuilder;
+use J3ns3n\LaravelLinkly\Client\LinklyClient;
 use J3ns3n\LaravelLinkly\Resources\Link;
 use J3ns3n\LaravelLinkly\Resources\LinkCollection;
 
@@ -15,7 +16,7 @@ use J3ns3n\LaravelLinkly\Resources\LinkCollection;
  * @method static bool deleteLink(string $linkId)
  * @method static LinkBuilder build(string $longUrl)
  *
- * @see \J3ns3n\LaravelLinkly\Client\LinklyClient
+ * @see LinklyClient
  */
 class Linkly extends Facade
 {
