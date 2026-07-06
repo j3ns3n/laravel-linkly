@@ -28,7 +28,7 @@ jobs:
           set -euo pipefail
 
           latest_php=$(curl -fsSL 'https://www.php.net/releases/index.php?json' \
-            | jq -r '[.[].version] | max_by(split(".") | map(tonumber))')
+            | jq -r '[.[].version] | map(select(test("^[0-9]+\\.[0-9]+\\.[0-9]+$"))) | max_by(split(".") | map(tonumber))')
           latest_php_minor=$(echo "$latest_php" | cut -d. -f1,2)
 
           latest_laravel=$(curl -fsSL 'https://repo.packagist.org/p2/laravel/framework.json' \
