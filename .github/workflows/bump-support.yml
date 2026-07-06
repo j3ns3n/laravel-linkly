@@ -37,6 +37,10 @@ jobs:
           latest_laravel_major=$(echo "$latest_laravel" | cut -d. -f1)
 
           known_php=$(yq -o=json '.jobs.test.strategy.matrix.php' .github/workflows/tests.yml)
+          # DRY RUN HACK (temporary, not for merge): pretend 8.5 isn't already supported so
+          # the detector treats a real, genuinely-installable PHP version as "new" and the
+          # validate/collect/bump pipeline can be exercised end-to-end for real.
+          known_php='["8.3", "8.4"]'
           known_laravel=$(yq -o=json '.jobs.test.strategy.matrix.laravel' .github/workflows/tests.yml)
           known_include=$(yq -o=json '.jobs.test.strategy.matrix.include' .github/workflows/tests.yml)
 
