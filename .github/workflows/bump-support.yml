@@ -1,0 +1,195 @@
+name: Bump PHP & Laravel Support
+
+on:
+  schedule:
+    - cron: '0 6 * * 1' # Every Monday at 06:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      needed: ${{ steps.detect.outputs.needed }}
+      new_php: ${{ steps.detect.outputs.new_php }}
+      new_laravel: ${{ steps.detect.outputs.new_laravel }}
+      new_testbench: ${{ steps.detect.outputs.new_testbench }}
+      matrix: ${{ steps.detect.outputs.matrix }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Detect new PHP and Laravel releases
+        id: detect
+        run: |
+          set -euo pipefail
+
+          latest_php=$(curl -fsSL 'https://www.php.net/releases/index.php?json' \
+            | jq -r '[.[].version] | max_by(split(".") | map(tonumber))')
+          latest_php_minor=$(echo "$latest_php" | cut -d. -f1,2)
+
+          latest_laravel=$(curl -fsSL 'https://repo.packagist.org/p2/laravel/framework.json' \
+            | jq -r '.packages["laravel/framework"][].version' \
+            | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sed 's/^v//' | sort -Vr | head -n1)
+          latest_laravel_major=$(echo "$latest_laravel" | cut -d. -f1)
+
+          known_php=$(yq -o=json '.jobs.test.strategy.matrix.php' .github/workflows/tests.yml)
+          known_laravel=$(yq -o=json '.jobs.test.strategy.matrix.laravel' .github/workflows/tests.yml)
+          known_include=$(yq -o=json '.jobs.test.strategy.matrix.include' .github/workflows/tests.yml)
+
+          new_php=""
+          if ! echo "$known_php" | jq -e --arg v "$latest_php_minor" 'map(tostring) | index($v) != null' >/dev/null; then
+            new_php="$latest_php_minor"
+          fi
+
+          new_laravel=""
+          new_testbench=""
+          if ! echo "$known_laravel" | jq -e --arg v "${latest_laravel_major}.*" 'index($v) != null' >/dev/null; then
+            new_laravel="${latest_laravel_major}.*"
+            # Orchestra Testbench majors have consistently trailed Laravel majors by 2 (e.g. Laravel 13 -> Testbench 11).
+            new_testbench="$((latest_laravel_major - 2)).*"
+          fi
+
+          echo "new_php=$new_php" >> "$GITHUB_OUTPUT"
+          echo "new_laravel=$new_laravel" >> "$GITHUB_OUTPUT"
+          echo "new_testbench=$new_testbench" >> "$GITHUB_OUTPUT"
+
+          if [ -z "$new_php" ] && [ -z "$new_laravel" ]; then
+            echo "needed=false" >> "$GITHUB_OUTPUT"
+            echo 'matrix={"include":[]}' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "needed=true" >> "$GITHUB_OUTPUT"
+
+          # Build the set of new combinations that must pass before either version is adopted.
+          combos=()
+
+          if [ -n "$new_php" ]; then
+            while read -r laravel testbench; do
+              combos+=("{\"php\":\"$new_php\",\"laravel\":\"$laravel\",\"testbench\":\"$testbench\"}")
+            done < <(echo "$known_include" | jq -r '.[] | "\(.laravel) \(.testbench)"')
+          fi
+
+          if [ -n "$new_laravel" ]; then
+            while read -r php; do
+              combos+=("{\"php\":\"$php\",\"laravel\":\"$new_laravel\",\"testbench\":\"$new_testbench\"}")
+            done < <(echo "$known_php" | jq -r '.[]')
+          fi
+
+          if [ -n "$new_php" ] && [ -n "$new_laravel" ]; then
+            combos+=("{\"php\":\"$new_php\",\"laravel\":\"$new_laravel\",\"testbench\":\"$new_testbench\"}")
+          fi
+
+          matrix=$(printf '%s\n' "${combos[@]}" | jq -s -c '{include: .}')
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+
+  validate:
+    needs: detect
+    if: needs.detect.outputs.needed == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.detect.outputs.matrix) }}
+    name: Validate P${{ matrix.php }} - L${{ matrix.laravel }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv
+          coverage: none
+
+      - name: Install dependencies
+        id: install
+        continue-on-error: true
+        run: |
+          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+          composer update --prefer-stable --prefer-dist --no-interaction
+
+      - name: Execute tests
+        id: test
+        if: steps.install.outcome == 'success'
+        continue-on-error: true
+        run: vendor/bin/phpunit tests
+
+      - name: Record result
+        if: always()
+        run: |
+          passed=false
+          if [ "${{ steps.install.outcome }}" = "success" ] && [ "${{ steps.test.outcome }}" = "success" ]; then
+            passed=true
+          fi
+          mkdir -p result
+          safe_name=$(echo "${{ matrix.php }}-${{ matrix.laravel }}" | tr -c 'A-Za-z0-9' '-')
+          jq -n --arg php "${{ matrix.php }}" --arg laravel "${{ matrix.laravel }}" \
+            --arg testbench "${{ matrix.testbench }}" --argjson passed "$passed" \
+            '{php: $php, laravel: $laravel, testbench: $testbench, passed: $passed}' > "result/$safe_name.json"
+
+      - name: Upload result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validate-result-${{ strategy.job-index }}
+          path: result/*.json
+
+  collect:
+    needs: [detect, validate]
+    if: always() && needs.detect.outputs.needed == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      results: ${{ steps.collect.outputs.results }}
+      any_passed: ${{ steps.collect.outputs.any_passed }}
+    steps:
+      - name: Download results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: validate-result-*
+          path: results
+          merge-multiple: true
+
+      - name: Aggregate results
+        id: collect
+        run: |
+          results=$(jq -s -c '.' results/*.json)
+          echo "results=$results" >> "$GITHUB_OUTPUT"
+          echo "any_passed=$(echo "$results" | jq -r 'any(.[]; .passed == true)')" >> "$GITHUB_OUTPUT"
+
+  bump:
+    needs: [detect, collect]
+    if: needs.detect.outputs.needed == 'true' && needs.collect.outputs.any_passed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Update composer.json and CI matrix
+        env:
+          RESULTS: ${{ needs.collect.outputs.results }}
+        run: |
+          echo "$RESULTS" > /tmp/validate-results.json
+          python3 .github/scripts/bump-support.py \
+            "${{ needs.detect.outputs.new_php }}" \
+            "${{ needs.detect.outputs.new_laravel }}" \
+            "${{ needs.detect.outputs.new_testbench }}" \
+            /tmp/validate-results.json
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "chore: bump supported PHP/Laravel versions"
+          title: "chore: bump supported PHP/Laravel versions"
+          body: |
+            Automated bump triggered by new upstream releases:
+
+            - PHP: ${{ needs.detect.outputs.new_php || '_no change_' }}
+            - Laravel: ${{ needs.detect.outputs.new_laravel || '_no change_' }}
+
+            Each new PHP/Laravel combination was test-run before this PR was opened (see the `validate` job on this workflow run). Combinations that failed were added as `exclude` entries instead of being silently dropped.
+          branch: bump-support/auto
+          labels: dependencies
