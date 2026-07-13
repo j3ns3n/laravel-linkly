@@ -147,7 +147,7 @@ jobs:
       any_passed: ${{ steps.collect.outputs.any_passed }}
     steps:
       - name: Download results
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: validate-result-*
           path: results
