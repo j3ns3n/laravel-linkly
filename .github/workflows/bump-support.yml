@@ -180,7 +180,7 @@ jobs:
             /tmp/validate-results.json
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           commit-message: "chore: bump supported PHP/Laravel versions"
           title: "chore: bump supported PHP/Laravel versions"
