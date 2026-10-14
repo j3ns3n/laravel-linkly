@@ -32,8 +32,7 @@ jobs:
           latest_php_minor=$(echo "$latest_php" | cut -d. -f1,2)
 
           latest_laravel=$(curl -fsSL 'https://repo.packagist.org/p2/laravel/framework.json' \
-            | jq -r '.packages["laravel/framework"][].version' \
-            | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sed 's/^v//' | sort -Vr | head -n1)
+            | jq -r '[.packages["laravel/framework"][].version | select(test("^v[0-9]+\\.[0-9]+\\.[0-9]+$")) | ltrimstr("v")] | max_by(split(".") | map(tonumber))')
           latest_laravel_major=$(echo "$latest_laravel" | cut -d. -f1)
 
           known_php=$(yq -o=json '.jobs.test.strategy.matrix.php' .github/workflows/tests.yml)
@@ -109,7 +108,9 @@ jobs:
         id: install
         continue-on-error: true
         run: |
-          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+          # illuminate/support is widened too: laravel/framework replaces it, so a new Laravel
+          # major can't install while composer.json still pins illuminate/support to older ones.
+          composer require "illuminate/support:${{ matrix.laravel }}" "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
           composer update --prefer-stable --prefer-dist --no-interaction
 
       - name: Execute tests
@@ -182,6 +183,9 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v8
         with:
+          # GITHUB_TOKEN can never push changes under .github/workflows/, and every bump edits
+          # tests.yml, so this needs a PAT with the `workflow` scope.
+          token: ${{ secrets.WORKFLOW_PAT }}
           commit-message: "chore: bump supported PHP/Laravel versions"
           title: "chore: bump supported PHP/Laravel versions"
           body: |
@@ -191,5 +195,7 @@ jobs:
             - Laravel: ${{ needs.detect.outputs.new_laravel || '_no change_' }}
 
             Each new PHP/Laravel combination was test-run before this PR was opened (see the `validate` job on this workflow run). Combinations that failed were added as `exclude` entries instead of being silently dropped.
+
+            If this PR changes `composer.json`, merging it publishes a new minor release (see `release-support-bump.yml`) so Packagist and the README badges pick up the new constraint.
           branch: bump-support/auto
           labels: dependencies

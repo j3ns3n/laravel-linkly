@@ -1,0 +1,40 @@
+name: Release Support Bump
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    if: github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'bump-support/auto'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Publish minor release
+        env:
+          # A release created with GITHUB_TOKEN doesn't trigger other workflows, so the PAT is
+          # used to let update-changelog.yml run on it.
+          GH_TOKEN: ${{ secrets.WORKFLOW_PAT }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+        run: |
+          set -euo pipefail
+
+          # The README badges read composer.json from the latest Packagist release, so only a
+          # constraint change is worth releasing. A PHP-only bump just touches the CI matrix.
+          if ! gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json files \
+            | jq -e '[.files[].path] | index("composer.json") != null' >/dev/null; then
+            echo "composer.json unchanged, skipping release."
+            exit 0
+          fi
+
+          latest=$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName --jq .tagName)
+          IFS=. read -r major minor _ <<< "$latest"
+          next="$major.$((minor + 1)).0"
+
+          gh release create "$next" --repo "$GITHUB_REPOSITORY" --target "$MERGE_SHA" \
+            --title "$next" --generate-notes
